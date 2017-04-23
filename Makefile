@@ -1,4 +1,8 @@
-.PHONY: clean clean-test clean-pyc clean-build docs help
+
+## nbmeta/Makefile
+
+.PHONY: default install nb test test-all run-all html-index readme-index \
+	index html-all clean clean-html clean-test clean-pyc clean-build docs help
 .DEFAULT_GOAL := help
 
 define BROWSER_PYSCRIPT
@@ -23,10 +27,15 @@ export PRINT_HELP_PYSCRIPT
 
 BROWSER := python -c "$$BROWSER_PYSCRIPT"
 
+mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
+mkfile_dir = $(shell dirname $(mkfile_path))
+
+default: help
+
 help:
 	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
-clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
+clean: clean-build clean-pyc clean-test clean-html ## remove all build, test, coverage and Python artifacts
 
 clean-build: ## remove build artifacts
 	rm -fr build/
@@ -83,3 +92,55 @@ dist: clean ## builds source and wheel package
 
 install: clean ## install the package to the active Python's site-packages
 	python setup.py install
+
+
+install-notebook:
+	# pip install virtualenvwrapper
+	# mkvirtualenv <name>
+	# bash ./install.sh
+	pip install jupyterlab
+
+
+nb:
+	jupyter notebook --ip=127.0.0.1 --notebook-dir=.
+
+lab:
+	jupyter lab --ip=127.0.0.1 --notebook-dir=.
+
+test: test-all
+
+test-all-nbs:
+	find $(mkfile_dir) -name '*.ipynb' -exec jupyter nbconvert --to notebook --execute {} \;
+
+run-all-nbs:
+	find $(mkfile_dir) -name '*.ipynb' -exec jupyter nbconvert --to notebook --execute {} \;
+
+
+html-index:
+	python ./makeindex.py \
+		--html \
+		--base-url=/github/westurner/nbmeta/blob/gh-pages/ > ./index.html
+
+readme-index:
+	python ./makeindex.py \
+		--readme \
+		--base-url=/github/westurner/nbmeta/blob/gh-pages/ > ./README.md
+
+index: html-index readme-index
+
+html-all:
+	find . -name '*.ipynb' -print0 | while read -d $$'\0' file; \
+	do \
+		if [ ! -z `echo $$file | grep -v '.ipynb_checkpoints/'` ]; \
+			cd $(mkfile_dir)/`dirname "$$file"`; \
+			ipython nbconvert "`basename $$file`" --to html; \
+			htmlfile=`echo "$$file" | sed 's/.ipynb$$/.html/g'` ; \
+		fi \
+	done;
+	$(MAKE) html-index
+	$(MAKE) readme-index
+
+
+clean-html:
+	rm index.html
+	find $(mkfile_dir) -name '*.html' -print0 | xargs -0 rm -fv
