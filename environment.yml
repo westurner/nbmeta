@@ -1,0 +1,10 @@
+name: nbmeta
+dependencies:
+- notebook
+- pygments
+- jinja2
+- path.py
+- dominate
+- runipy
+#- pip:
+#  -

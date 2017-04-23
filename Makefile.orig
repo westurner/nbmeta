@@ -1,0 +1,8 @@
+
+
+default: run
+
+ARGS:=--certfile= --keyfile= --client-ca=
+
+run:
+	jupyter notebook
