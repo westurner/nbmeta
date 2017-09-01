@@ -75,10 +75,17 @@ Design Requirements
   
     - [ ] SQLAlchemy
     - [ ] tablib
+    
+      - Src: https://github.com/kennethreitz/tablib
+      - Docs: http://docs.python-tablib.org/en/master/
+    
     - [ ] numpy
     - [ ] Pandas
     - [ ] xray
     - [ ] arrow
+    
+      - Src: https://github.com/apache/arrow
+      - Spec: https://github.com/apache/arrow/blob/master/format/Schema.fbs
     
   - Data Validation, HTML/JS Forms:
   
