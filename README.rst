@@ -6,7 +6,13 @@ nbmeta
   https://github.com/westurner/nbmeta/issues/1
 
 - Initial API:
+ 
+  https://github.com/westurner/nbmeta/blob/develop/nb/nbmeta-00-01__exploration.py
+
   https://github.com/westurner/nbmeta/blob/develop/nb/nbmeta-00-01__exploration.ipynb
+  
+  https://nbviewer.jupyter.org/github/westurner/nbmeta/blob/develop/nb/nbmeta-00-01__exploration.ipynb
+  
   
 API
 =====
