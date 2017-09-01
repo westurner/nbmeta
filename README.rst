@@ -86,6 +86,14 @@ Design Requirements
     
       - Src: https://github.com/apache/arrow
       - Spec: https://github.com/apache/arrow/blob/master/format/Schema.fbs
+      
+    - [ ] attrs
+    
+      - Src: https://github.com/python-attrs/attrs
+      - Docs: https://attrs.readthedocs.io/en/stable/
+      - Docs: https://attrs.readthedocs.io/en/stable/examples.html#metadata
+      - Docs: https://attrs.readthedocs.io/en/stable/extending.html#extending-metadata
+
     
   - Data Validation, HTML/JS Forms:
   
@@ -94,6 +102,7 @@ Design Requirements
     - [ ] colander: https://github.com/Pylons/colander
     - [ ] marshmallow: https://github.com/marshmallow-code/marshmallow
     - [ ] {...}
+    - [ ] attrs: https://attrs.readthedocs.io/en/stable/examples.html#validators (decorators, callables)
     - [ ] strypes: https://github.com/westurner/strypes
     
 
