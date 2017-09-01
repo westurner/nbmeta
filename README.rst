@@ -2,6 +2,16 @@
 nbmeta
 ###########
 
+Features
+===========
+- [ ] Add metadata with schema.org classes and properties: Thing(name=, author=, url=)
+- [ ] Add metadata about the whole JupyterNotebook to be displayed at the top (as RDFa HTML and/or JSON-LD)
+- [ ] Add metadata by emitting structured data nodes from a notebook cell (as RDFa HTML and/or JSON-LD)
+
+
+Project
+==========
+
 - Issue #1:
   https://github.com/westurner/nbmeta/issues/1
 
