@@ -1,6 +1,8 @@
 ###########
 nbmeta
 ###########
+| Src: https://github.com/westurner/nbmeta/
+
 
 Features
 ===========
@@ -62,4 +64,29 @@ API
 - [ ] Pipfile(SE)(pipfile='../Pipfile')
 - [ ] PipfileLock(SE)(?='../Pipfile.lock')
 - [ ] CondaEnvironment(yml='../environment.yml')
+
+Design Requirements
+======================
+- Define ``class Meta()`` such that the schema can be passed through to/as:
+
+  - [ ] CSVW
+  - Data Libraries:
+  
+    - [ ] SQLAlchemy
+    - [ ] tablib
+    - [ ] numpy
+    - [ ] Pandas
+    - [ ] xray
+    - [ ] arrow
+    
+  - Data Validation, HTML/JS Forms:
+  
+    - [ ] JSONSchema: http://json-schema.org/documentation.html
+    - [ ] SHACL: https://www.w3.org/TR/shacl
+    - [ ] colander: https://github.com/Pylons/colander
+    - [ ] marshmallow: https://github.com/marshmallow-code/marshmallow
+    - [ ] {...}
+    - [ ] strypes: https://github.com/westurner/strypes
+    
+
 
