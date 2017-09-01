@@ -102,7 +102,11 @@ Design Requirements
     - [ ] colander: https://github.com/Pylons/colander
     - [ ] marshmallow: https://github.com/marshmallow-code/marshmallow
     - [ ] {...}
-    - [ ] attrs: https://attrs.readthedocs.io/en/stable/examples.html#validators (decorators, callables)
+    - [ ] attrs
+    
+      - https://attrs.readthedocs.io/en/stable/examples.html#validators (decorators, callables)
+      - https://attrs.readthedocs.io/en/stable/api.html#api-validators
+      
     - [ ] strypes: https://github.com/westurner/strypes
     
 
