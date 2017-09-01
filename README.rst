@@ -3,6 +3,7 @@ nbmeta
 ###########
 | Src: https://github.com/westurner/nbmeta/
 
+.. contents::
 
 Features
 ===========
