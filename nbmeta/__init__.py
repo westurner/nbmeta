@@ -1,12 +1,17 @@
-
+#!/usr/bin/env python
 """
 nbmeta
 -------
-# * Src: https://github.com/westurner/nbmeta
-"""
+Top-level package for nbmeta.
 
-import utils
-from utils import (
+* Src: https://github.com/westurner/nbmeta
+"""
+__author__ = """Wes Turner"""
+__email__ = 'wes@wrd.nu'
+__version__ = '0.1.0'
+
+
+from .utils import (
     DisplayConfig,
     EmitConfig,
 
@@ -15,8 +20,8 @@ from utils import (
 
 )
 
-from nodes import (
-    'Meta',
+# from nodes import (
+#     'Meta',
 
 __ALL__ = ['utils',
            'DisplayConfig',
