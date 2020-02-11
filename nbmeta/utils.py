@@ -6,8 +6,17 @@ nbmeta.utils
 
 """
 from __future__ import print_function
+import logging
 from collections import OrderedDict
-from IPython.display import display, HTML
+
+log = logging.getLogger()
+
+try:
+    from IPython.display import display, HTML
+except ImportError:
+    log.debug("IPython not found, stubbing in print as display and HTML")
+    display = print
+    HTML = print
 
 
 def _display(obj, **kwargs):
