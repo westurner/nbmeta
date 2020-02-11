@@ -2,7 +2,7 @@ Welcome to nbmeta's documentation!
 ======================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
    :caption: Contents:
 
    readme
@@ -12,6 +12,7 @@ Welcome to nbmeta's documentation!
    contributing
    authors
    history
+   roadmap
 
 Indices and tables
 ==================
