@@ -1,16 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import print_function
 """
-makeindex
+makeindex -- generate an index.html for a directory of .ipynb files
+and add nbviewer.org links
 """
+import logging
+import os
 import sys
 import urllib
+import unittest
 
 import jinja2
-import path as Path
+from path import Path
 
 __pip_requires__ = ('jinja2', 'path.py',)
+
+
+log = logging.getLogger()
+log.setLevel(logging.DEBUG)
 
 
 def filter_ipynb(path):
@@ -23,91 +30,130 @@ def filter_ipynb(path):
     return True
 
 
-def find_notebooks(path, pattern='*.ipynb',
-                   base_url=None, filterfn=filter_ipynb):
-    _base_url = None
-    if base_url:
-        _, _url = urllib.splittype(base_url)
-        _base_url = base_url and Path.path(
-            u'/'.join(('https://nbviewer.ipython.org', _url.lstrip('/'))))
-    _path = Path.path(path)
-    for ipynb in _path.walk(pattern=pattern):
+def find_notebooks(
+        path, pattern='*.ipynb',
+        nbviewer_url_prefix=None,
+        binderhub_url_prefix=None,
+        filterfn=filter_ipynb):
+    """find .ipynb files and yield them"""
+
+    _nbviewer_url_prefix = None
+    if nbviewer_url_prefix:
+        _url = urllib.parse.urlparse(nbviewer_url_prefix)
+        _nbviewer_url_prefix = nbviewer_url_prefix and Path(
+            '/'.join(('https://nbviewer.org', _url.path.lstrip('/'))))
+
+    _binderhub_url_prefix = None
+    if binderhub_url_prefix:
+        _binderhub_url_prefix = binderhub_url_prefix and Path(
+            f'{binderhub_url_prefix.removesuffix("?labpath=")}?labpath=')
+
+    _path = Path(path)
+    for ipynb in _path.walk(match=pattern):
         if filterfn(ipynb):
             html = None
             # _html = ipynb.splitext()[0] + '.html'
-            _html = u"%s.html" % ipynb
-            if Path.path(_html).exists():
-                html = _html
+            ipynb_html_filename = f"{ipynb}.html"
+            if (_path / ipynb_html_filename).exists():
+                html = (_path / ipynb_html_filename).contents()
+
+            ipynb_path_cleaned = ipynb.removeprefix('./').removeprefix('/')
             yield {
+                'uri': 'TODO:' + urllib.parse.quote_plus(ipynb),
                 'ipynb': ipynb,
                 'html': html,
-                'nbviewer': base_url and _base_url / ipynb}
+                'nbviewer': nbviewer_url_prefix and _nbviewer_url_prefix / ipynb_path_cleaned,
+                'binderhub': (
+                    binderhub_url_prefix and
+                    _binderhub_url_prefix + urllib.parse.quote_plus(ipynb_path_cleaned))
+            }
 
 
 def makeindex(template, path='.',
               pattern='*.ipynb',
-              base_url=None,
+              title=None,
+              nbviewer_url_prefix=None,
+              binderhub_url_prefix=None,
               filterfn=filter_ipynb,
               convertargs=None):
     """
     Generate an HTML index for a set of ipython notebooks
 
     Templates:
-     * index.jinja  -- HTML index
-     * readme.jinja -- README.md index
+     * index.html.jinja  -- HTML index
+     * README.md.jinja -- README.md index
     """
+    templatename, _ = os.path.splitext(template)
+    _, ext = os.path.splitext(templatename)
+    header = path / Path(f'{templatename}.header{ext}')
+    footer = path / Path(f'{templatename}.footer{ext}')
+    header_text = header.read_text() if header.exists() else ""
+    footer_text = footer.read_text() if footer.exists() else ""
+    path = Path(path).normpath()
+    context = {
+        'title': title if title else "",
+        'notebooks': sorted(
+            find_notebooks(path,
+                           filterfn=filterfn,
+                            nbviewer_url_prefix=nbviewer_url_prefix,
+                            binderhub_url_prefix=binderhub_url_prefix),
+            key=lambda x: (x['ipynb'].lower(), x['ipynb'])),
+        'header': header,
+        'header_text': header_text,
+        'footer': footer,
+        'footer_text': footer_text,
+    }
+    templatedir = Path(__file__).absolute().dirname() / 'templates'
+    loader = jinja2.FileSystemLoader(templatedir)
+    env = jinja2.Environment()  # autoescape=True
+    log.debug(dict(
+        template=template,
+        context=context)
+    )
+    tmpl = loader.load(env, template)
+    return tmpl.render(context)
+
     context = {
         'notebooks': list(
-            find_notebooks(path, base_url=base_url, filterfn=filterfn)),
+            find_notebooks(
+                path,
+                filterfn=filterfn)),
     }
-    templatedir = Path.path(__file__).abspath().dirname() / 'templates'
+    templatedir = Path(__file__).absolute().dirname() / 'templates'
     loader = jinja2.FileSystemLoader(templatedir)
     env = jinja2.Environment()  # autoescape=True
     tmpl = loader.load(env, template)
     return tmpl.render(context)
 
 
-def nbconvert_all(convertargs=None):
-    conf = {}
-    cmd = ['jupyter', 'nbconvert',]
-    if 'output_dir' in conf:
-        cmd.extend(('--output-dir', conf.get('output_dir')))
-    if convertargs is None:
-        convertargs = []
-    else:
-        for args in convertargs:
-            if not isinstance(args, (tuple, list)):
-                raise ValueError('args is not a tuple or a list: %r' % args)
-            cmd.extend(args)
-                   '--to', fmt, destfilename,
-
-
-import unittest
-
-
 class Test_makeindex(unittest.TestCase):
 
     def test_makeindex_html(self):
-        output = makeindex('index.jinja', path='.')
-        self.assertIn('IPython notebooks', output)
-        self.assertIn('<li>', output)
+        output = makeindex('index.html.jinja', path='.')
+        self.assertIn('<!-- Note: this file is autogenerated by makeindex.py -->', output)
+        self.assertIn('</li>', output)
         self.assertIn('<a href=".', output)
 
     def test_makeindex_readme_md(self):
-        output = makeindex('readme.jinja', path='.')
-        self.assertIn('IPython notebooks', output)
+        output = makeindex('README.md.jinja', path='.')
+        self.assertIn('<!-- Note: this file is autogenerated by makeindex.py -->', output)
         self.assertIn('*', output)
         self.assertIn('<a href=".', output)
 
 
 def main(*args):
+    """makeindex main method"""
     import optparse
     import logging
 
-    prs = optparse.OptionParser(usage="%prog: [args]")
+    prs = optparse.OptionParser(
+        usage="%prog [-h][-v] [-t] [--base-url=<URL>] [--html] [--readme]]")
 
-    prs.add_option('--base-url',
-                   dest='base_url',
+    prs.add_option('--nbviewer-url',
+                   dest='nbviewer_url_prefix',
+                   action='store')
+    prs.add_option('--binderhub-url',
+                   dest='binderhub_url_prefix',
                    action='store')
 
     prs.add_option('--html',
@@ -136,19 +182,28 @@ def main(*args):
         if opts.verbose:
             logging.getLogger().setLevel(logging.DEBUG)
 
+    log.debug(('args', args))
+    log.debug(('opts', opts))
+
     if opts.run_tests:
         sys.argv = [sys.argv[0]] + args
         sys.exit(unittest.main())
 
+    kwargs = dict(
+        path='.',
+        nbviewer_url_prefix=opts.nbviewer_url_prefix,
+        binderhub_url_prefix=opts.binderhub_url_prefix)
+
     if opts.html:
-        output = makeindex("index.jinja", path='.', base_url=opts.base_url)
+        output = makeindex("index.html.jinja", **kwargs)
         print(output)
 
     if opts.readme:
-        output = makeindex("readme.jinja", path='.', base_url=opts.base_url)
+        output = makeindex("README.md.jinja", **kwargs)
         print(output)
 
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())
