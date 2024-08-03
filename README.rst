@@ -24,7 +24,7 @@ RDF, JSON-LD, YAML-LD metadata support for Jupyter Notebook, Sphinx
 * Free software: BSD license
 * Documentation: `docs/roadmap.rst <./roadmap>`__
 
-.. * Documentation: https://nbmeta.readthedocs.io.
+.. * Documentation: https://nbmeta.readthedocs.io/
 
 
 Features
