@@ -1,13 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# from __future__ import print_function
 """
 nbmeta.nodes.meta
 ------------------
 
 """
+
+import html
+from dominate import tags
+
 # from collections import OrderedDict
-from nbmeta.ordereddefaultdict import OrderedDefaultDict
+from ..ordereddefaultdict import OrderedDefaultDict
+from .html import ReprHTML
 
 
 class Node(OrderedDefaultDict):
@@ -31,14 +35,14 @@ class Meta(object):
     def to_html(self):
         typeof = "http://schema.org/CreativeWork http://jupyter/ns#JupyterNotebook"
         typeof = u' '.join(self.meta['@type'])
-        with div(typeof=typeof) as doc:
+        with tags.div(typeof=typeof) as doc:
             def metahtml(obj, cur_node):
-                with cur_node as doc:
+                with cur_node as _:
                     with tags.ul() as ul_node:
                         if hasattr(obj, 'items'):
                             for key, value in obj.items():
                                 with tags.li(property=key) as li_node:
-                                    li_node.add(a(key, href=key, property="rdf:Predicate"))
+                                    li_node.add(tags.a(key, href=key, property="rdf:Predicate"))
                                     visit_node(value, key, li_node=li_node)
                         #elif hasattr(obj, '__iter__'):
                         #    for value in obj:
@@ -51,32 +55,32 @@ class Meta(object):
                 return cur_node
 
             def visit_node(value, key=None, li_node=None):
-                if isinstance(value, basestring):
+                if isinstance(value, str):
                     if value.startswith('http://'):  # TODO: isinstance(URI)
-                        a( span(text(value), property=key),
+                        tags.a(tags.span(tags.text(value), property=key),
                           href=value,
                           property='rdf:Object')
                     else:
-                        span(text(value), property=key)
+                        tags.span(tags.text(value), property=key)
                 elif hasattr(value, 'items'):
                     metahtml(value.items(), li_node)
-                #elif isinstance(value, Meta):
+                # elif isinstance(value, Meta):
                 #    metahtml(value.obj, li_node)  # TODO: value.obj ->
                 elif hasattr(value, '__iter__'):
-                #elif isinstance(value, (list, tuple)):
+                # elif isinstance(value, (list, tuple)):
                     with tags.ul() as _ul_node:
                         with tags.li() as _li_node:
                             # TODO: BUG: XXX
-                            #raise Exception(value)
+                            # raise Exception(value)
                             for _value in value:
-                                #_items = OrderedDict(
+                                # _items = OrderedDict(
                                 #    (__value, __value) for __value in _value).items()
                                 metahtml(_value, _li_node)  # TODO
                 elif hasattr(value, '_repr_html_'):
-                    text(value._repr_html_(), escape=False)
-                #if isinstance(value, dominator.tag)
+                    tags.text(value._repr_html_(), escape=False)
+                # if isinstance(value, dominator.tag)
                 elif hasattr(value, 'render'):
-                    text(value.render(), escape=False)
+                    tags.text(value.render(), escape=False)
                 #TODO: markupsafe __html__ ("?)
                 else:
                     raise Exception((type(value), value))
@@ -92,11 +96,11 @@ class Meta(object):
         elif hasattr(obj, 'render'):
             obj_html = obj.render()
         else:
-            obj_html = str(obj) #cgi.escape(repr(obj))
-        assert type(obj_html) == unicode
+            obj_html = html.escape(repr(obj))
+        assert isinstance(obj_html, str)
         meta_html = self.to_html()
-        assert type(meta_html) == unicode
-        return u'\n'.join((obj_html, self.to_html()))
+        assert isinstance(meta_html, str)
+        return u'\n'.join((obj_html, meta_html))
 
 
 def test_meta():
@@ -111,7 +115,13 @@ def test_meta():
     # ns['@context']['rdf'] = # RDF_URI
     # ns['@context']["a"] = "rdf:type"
 
-    ReprHTML(
+    # TODO
+    class this:
+        @staticmethod
+        def render():
+            return True
+
+    node = ReprHTML(
         Meta(this.render(),
             meta=Node([
             (schema['url'], "http://localhost:8888/notebooks/nb/...ipynb"),
@@ -125,6 +135,9 @@ def test_meta():
             ])
         )
     )
+    assert node
+    assert note.to_html()
+    assert node._repr_html_()
 
     # TODO
     # RreprJSONLD() RDFa

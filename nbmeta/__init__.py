@@ -4,8 +4,7 @@ nbmeta
 # * Src: https://github.com/westurner/nbmeta
 """
 
-#import utils
-from utils import (
+from .utils import (
     DisplayConfig,
     EmitConfig,
 
@@ -13,8 +12,20 @@ from utils import (
     emit
 )
 
-from nodes import (
+from .nodes.meta import (
     Meta
+)
+
+from .nodes.html import (
+    ReprHTMLConf,
+
+    ReprHTML,
+    highlight_html,
+
+    CodeBlock,
+    json_loads,
+    json_dumps,
+
 )
 
 __ALL__ = ['utils',

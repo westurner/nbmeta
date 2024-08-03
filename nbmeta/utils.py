@@ -7,12 +7,14 @@ nbmeta.utils
 """
 from __future__ import print_function
 import logging
+import unittest
 from collections import OrderedDict
 
 log = logging.getLogger()
 
 try:
     from IPython.display import display, HTML
+    from IPython.core.interactiveshell import get_ipython
 except ImportError:
     log.debug("IPython not found, stubbing in print as display and HTML")
     display = print
@@ -38,6 +40,7 @@ class EmitConfig:
     # emit_writefn = staticmethod(print)
     emit_allowoverwrite = False
 
+
 _STORE = None
 
 
@@ -54,7 +57,8 @@ def emit(key=None, obj=None, store=None, writefn=EmitConfig.emit_writefn):
     key = len(store) if key is None else key
     if EmitConfig.emit_allowoverwrite:
         if key in store:
-            raise KeyError((key, 'is already set the store. see emit_allowoverwrite'))
+            raise KeyError(
+                (key, 'is already set the store. see emit_allowoverwrite'))
     store[key] = obj
     output = (key, obj)
     writefn(output)
@@ -79,7 +83,6 @@ def test_emit_store():
     # print(pformat(_STORE))
 
 
-
 def test_todo():
     # ''' [ ] how to set the cell metadata? '''
     sorted(globals().keys())
@@ -89,14 +92,7 @@ def test_todo():
     instance = ipy.instance()
     emit('ipy.instance()', instance)
     # instance.
-    #globals()['celldata'][cell_n] = value
-
-
-# In[ ]:
-
-
-
-
+    # globals()['celldata'][cell_n] = value
 
 
 def nbmetautil(abc):
@@ -118,12 +114,6 @@ def nbmetautil(abc):
         Exception: ...
     """
     pass
-
-
-
-
-
-import unittest
 
 
 class Test_nbmetautil(unittest.TestCase):
@@ -163,7 +153,6 @@ def main(argv=None):
                    dest='run_tests',
                    action='store_true',)
 
-
     argv = list(argv) if argv else []
     (opts, args) = prs.parse_args(args=argv)
     loglevel = logging.INFO
@@ -186,6 +175,7 @@ def main(argv=None):
     EX_OK = 0
     abc = "123"
     output = nbmetautil(abc)
+    assert output
     return EX_OK
 
 

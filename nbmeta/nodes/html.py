@@ -10,9 +10,7 @@ from __future__ import print_function
 import collections
 import json
 
-import dominate
-import dominate.util
-tags = dominate.tags
+from dominate import tags
 from dominate.tags import ( div, h3, code, span, s )
 from dominate.util import ( text, raw )
 
@@ -77,20 +75,6 @@ class ReprHTML(object):
         return doc_html
 
 
-def test_reprhtml():
-    #ReprHTMLConf.print_html = True
-    with div("this") as this:
-        this.add(div("that", id="that"))
-        div("that2", id="that")
-        with tags.ul():
-            for n in range(3):
-                tags.li(n)
-    obj = ReprHTML(this) #.render())
-    assert obj
-    assert hasattr(obj, '_repr_html_')
-    # TODO
-
-
 class CodeBlock(object):
     def __init__(self, code, fmt='jsonld'):
         self.code = code
@@ -110,51 +94,13 @@ class CodeBlock(object):
             _fmt['lexer'](),
             _fmt['formatter'])
 
+
 def json_loads(obj, *args, **kwargs):
     kwargs.setdefault('object_pairs_hook', collections.OrderedDict)
     return json.loads(obj, *args, **kwargs)
 
+
 def json_dumps(obj, *args, **kwargs):
     kwargs.setdefault('indent', 2)
     return json.dumps(obj, *args, **kwargs)
-
-
-def test_Meta_CodeBlock():
-    _jsonldstr = """
-        {"@context": {
-            "schema": "http://schema.org/",
-            "jupyter": "https://jupyter.org/ns/v4/#",
-            "_base": "http://localhost:8000/ns/v1#"
-        },
-        "@type": [
-        "jupyter:JupyterNotebook",
-        "schema:ScholarlyArticle",
-        "schema:DataCatalog"
-        ],
-        "@id": "http://localhost:8888/notebooks/nb/nbmeta-00-01__exploration.ipynb",
-        "name": "Notebook Name",
-        "author": [{
-        "@type": "schema:Person",
-        "givenName": "Wesley",
-        "familyName": "Turner",
-        "url": "https://westurner.org/"
-        }],
-        "dateCreated": "2017-01-30",
-        "about": [
-            {"url": ["https://en.wikipedia.org/wiki/JSONLD"] },
-            {"url": "https://pypi.org/project/pipfile/", "name": "Pipfile and Pipfile.lock"}
-        ]
-    }
-    """
-
-    data = {}
-    data['objs'] = json_loads(_jsonldstr)
-
-    #ReprHTML(
-    m = Meta(
-        CodeBlock(_jsonldstr, fmt='jsonld'),
-        jsonld=json_dumps(data['objs']))
-    print(m.meta['jsonld'])
-    m
-    return m
 
