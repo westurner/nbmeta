@@ -5,6 +5,6 @@ dependencies:
 - jinja2
 - path.py
 - dominate
-- runipy
+- nbconvert
 #- pip:
 #  -
