@@ -119,12 +119,16 @@ run-all-nbs:
 html-index:
 	python ./makeindex.py \
 		--html \
-		--base-url=/github/westurner/nbmeta/blob/gh-pages/ > ./index.html
+		--nbviewer-url="https://nbviewer.org/github/westurner/nbmeta/blob/main/" \
+		--binderhub-url="https://mybinder.org/v2/gh/westurner/nbmeta/main?labpath=" \
+		> ./index.html
 
 readme-index:
 	python ./makeindex.py \
 		--readme \
-		--base-url=/github/westurner/nbmeta/blob/gh-pages/ > ./README.md
+		--nbviewer-url="https://nbviewer.org/github/westurner/nbmeta/blob/main/" \
+		--binderhub-url="https://mybinder.org/v2/gh/westurner/nbmeta/main?labpath=" \
+		> ./README.md
 
 index: html-index readme-index
 
